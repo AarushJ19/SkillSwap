@@ -5,9 +5,9 @@ const express = require('express');
 const connectDB = require('./config/db');
 
 const app = express();
-// app.get('/', (req, res) => {
-//     res.send('Welcome to the home screen!');
-// });
+app.get('/', (req, res) => {
+    res.send('Welcome to the home screen!');
+});
 // Connect to MongoDB
 connectDB();
 

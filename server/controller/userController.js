@@ -5,37 +5,43 @@ const jwt = require('jsonwebtoken');
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
-
-  try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists!' });
+    const { username, email, password } = req.body;
+  
+    try {
+      let user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({ msg: 'User already exists!' });
+      }
+  
+      user = new User({
+        username,
+        email,
+        password: await bcrypt.hash(password, 10),
+      });
+  
+      await user.save();
+  
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
+  
+      jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+        if (err) throw err;
+        res.json({ 
+          message: 'User successfully registered',
+          username: user.username,
+          email: user.email,
+          token 
+        });
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server error');
     }
-
-    user = new User({
-      username,
-      email,
-      password: await bcrypt.hash(password, 10),
-    });
-
-    await user.save();
-
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
-    });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send('Server error');
-  }
-};
+  };
+  
 
 // Login a user
 const loginUser = async (req, res) => {
@@ -87,57 +93,60 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { username, email, password } = req.body;
-    const { username: usernameToUpdate, password: userPassword } = req.user;
+    const { username } = req.body;
+    // const { username: currentUsername } = req.user; // Assuming the token contains the username
+    const { newUsername, newEmail, newPassword } = req.body;
   
     try {
-      let user = await User.findOne({ username: usernameToUpdate });
+      // Find the user by username
+      let user = await User.findOne({ username });
+      // console.log('User:', user); // Log the user object
       if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
+          return res.status(404).json({ msg: 'User not found 404' });
       }
   
-      // Verify user's password
-      const isMatch = await bcrypt.compare(userPassword, password);
-      if (!isMatch) {
-        return res.status(401).json({ msg: 'Incorrect password' });
-      }
-  
-      if (username) user.username = username;
-      if (email) user.email = email;
-      if (password) user.password = await bcrypt.hash(password, 10);
+      if (newUsername) user.username = newUsername;
+      if (newEmail) user.email = newEmail;
+      if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
   
       await user.save();
-      res.json({ msg: 'User updated successfully' });
+      res.json({ msg: 'User details updated successfully' });
     } catch (error) {
       console.error(error.message);
       res.status(500).send('Server error');
     }
-  };
+};
+
   
   // Delete user
   const deleteUser = async (req, res) => {
-    const { password } = req.body;
-    const { username: usernameToDelete } = req.user;
-  
+    const { username, password } = req.body;
+
     try {
-      let user = await User.findOne({ username: usernameToDelete });
-      if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
-      }
-  
-      // Verify user's password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ msg: 'Incorrect password' });
-      }
-  
-      await user.remove();
-      res.json({ msg: 'User deleted successfully' });
+        // Find the user by username
+        let user = await User.findOne({ username });
+        // console.log('User:', user); // Log the user object
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found 404' });
+        }
+
+        // Verify user's password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ msg: 'Incorrect password' });
+        }
+
+        // Remove the user
+        await User.deleteOne({ _id: user._id }); // or await User.deleteOne({ username }) if username is unique
+        res.json({ msg: 'User deleted successfully' });
     } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
+        console.error('Delete user error:', error);
+        res.status(500).send('Server error');
     }
-  };
+};
+
+
+
   
 
 module.exports = {
