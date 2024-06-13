@@ -1,24 +1,75 @@
-import axios from 'axios'; // Import Axios for making HTTP requests
+import React, { useState } from 'react';
+import axios from 'axios';
+import './register.css'; // Assuming you have a CSS file for styling
 
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
+const Register = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+  const { username, email, password } = formData;
 
-        const formData = new FormData(form);
-        const username = formData.get('username');
-        const email = formData.get('email');
-        const password = formData.get('password');
+  const onChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-        axios.post('/api/register', { username, email, password })
-            .then(response => {
-                console.log('Registration successful:', response.data);
-                // Handle success (e.g., show a success message to the user)
-            })
-            .catch(error => {
-                console.error('Registration failed:', error);
-                // Handle error (e.g., display an error message to the user)
-            });
-    });
-});
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:5000/api/users/register', {
+        username,
+        email,
+        password,
+      });
+      console.log('Registration successful:', res.data);
+      alert('User successfully registered');
+    } catch (err) {
+      console.error('Registration failed:', err);
+      alert('Registration failed');
+    }
+  };
+
+  return (
+    // <div classname="background">
+    <div className="register-container">
+      {/* <h1>Register</h1> */}
+      <form onSubmit={onSubmit}>
+        <div className="form-group">
+          <label>Username:</label>
+          <input
+            type="text"
+            name="username"
+            value={username}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Password:</label>
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">Register</button>
+      </form>
+    {/* </div> */}
+    </div>
+  );
+};
+
+export default Register;

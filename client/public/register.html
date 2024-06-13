@@ -30,6 +30,7 @@
 
     input[type="text"],
     input[type="password"],
+    input[type="email"],
     button {
       display: block;
       width: 100%;
@@ -49,17 +50,17 @@
       background-color: #0056b3;
     }
   </style>
-  <script src="register.js"></script>
-
 </head>
 <body>
   <div class="container">
     <h1>Register</h1>
     <form>
-      <input type="text" name="username" placeholder="Username">
-      <input type="password" name="password" placeholder="Password">
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Password" required>
       <button type="submit">Register</button>
     </form>
   </div>
+  <script src="register.js" type="module"></script>
 </body>
 </html>
