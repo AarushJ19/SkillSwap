@@ -1,12 +1,17 @@
 import React from 'react';
-import Register from './register';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Register from './register'; // Adjust the path based on your directory structure
+import Login from './login'; // Adjust the path based on your directory structure
 
 const App = () => {
   return (
-    <div>
-      <h1>Register</h1>
-      <Register />
-    </div>
+    <Router>
+      <div>
+        <Route exact path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        {/* You can add more routes here as needed */}
+      </div>
+    </Router>
   );
 };
 
