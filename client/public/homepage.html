@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Homepage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .greeting {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="greeting" id="greeting"></div><br><br><br><br>
+  <h1>Welcome to Your Homepage</h1><br><br><br><br>
+  <div id="personalized-content"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = sessionStorage.getItem('token');
+      const userName = sessionStorage.getItem('name');
+
+      if (!token) {
+        window.location.href = '/login.html';
+      } else {
+        const greetingDiv = document.getElementById('greeting');
+        const currentHour = new Date().getHours();
+        let timeOfDay;
+
+        if (currentHour < 12) {
+          timeOfDay = 'morning';
+        } else if (currentHour < 18) {
+          timeOfDay = 'afternoon';
+        } else {
+          timeOfDay = 'evening';
+        }
+
+        greetingDiv.innerHTML = `Hello, ${userName} and good ${timeOfDay}!`;
+
+        const contentDiv = document.getElementById('personalized-content');
+        // contentDiv.innerHTML = `<p>Welcome to your personalized homepage!</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

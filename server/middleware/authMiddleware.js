@@ -1,13 +1,9 @@
 // middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-exports.authenticateUser = (req, res, next) => {
-  const authHeader = req.header('Authorization');
-  if (!authHeader) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
-  }
-
-  const token = authHeader.split(' ')[1];
+const authenticateUser = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ msg: 'No token, authorization denied' });
@@ -15,10 +11,13 @@ exports.authenticateUser = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded); // Log the decoded token
     req.user = decoded.user;
-    next(); // Pass control to the next middleware or route handler
+    next();
   } catch (err) {
     res.status(401).json({ msg: 'Token is not valid' });
   }
+};
+
+module.exports = {
+  authenticateUser,
 };

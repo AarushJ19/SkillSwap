@@ -1,21 +1,20 @@
-require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
 const app = express();
 
-// Connect to MongoDB
+// Connect Database
 connectDB();
 
-// Middleware to parse JSON
-app.use(express.json());
-
-// Enable CORS
+// Init Middleware
+app.use(express.json({ extended: false }));
 app.use(cors());
 
-// Routes
+// Define Routes
+app.use('/api/auth', require('./routes/authroutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
